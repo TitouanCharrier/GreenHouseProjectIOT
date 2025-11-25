@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 
 BROKER = "localhost"
 PORT = 1883
-TOPIC = "greenhouse"
+KEY = "CQl7gttGyfhBrX8W2tC6"
 
 state = {
     "temperature": 24.0,
@@ -57,13 +57,13 @@ def on_message(client, userdata, message):
 
 def main():
     client = mqtt.Client()
-
+    client.username_pw_set(username=KEY, password="")
     client.on_connect = on_connect
     client.on_message = on_message
 
     client.connect(BROKER, PORT, 60)
 
-    client.subscribe(TOPIC + "/command")
+    client.subscribe("v1/devices/me/rpc/request/+")
 
     client.loop_start()
 
@@ -73,7 +73,7 @@ def main():
         while True:
             simulate_step()
             payload = json.dumps(state)
-            client.publish(TOPIC + "/data", payload)
+            client.publish("v1/devices/me/telemetry", payload)
             print("Pubblished data :", payload)
             time.sleep(10)
     except KeyboardInterrupt:
