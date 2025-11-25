@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 
 BROKER = "localhost"
 PORT = 1883
-TOPIC = "greenhouse/data"
+TOPIC = "greenhouse"
 
 state = {
     "temperature": 24.0,
@@ -41,13 +41,11 @@ def simulate_step():
     state["oxygen"] = max(19.0, min(21.0, state["oxygen"]))
 
 def on_connect(client, userdata, flags, rc):
-    print("Connecté au broker MQTT avec code:", rc)
+    print("Connected to brocker :", rc)
 
 def on_message(client, userdata, message):
     global state
     payload = message.payload.decode()
-    print("Commande reçue :", payload)
-
     try:
         cmd = json.loads(payload)
         for key, value in cmd.items():
@@ -55,7 +53,7 @@ def on_message(client, userdata, message):
                 state[key] = value
                 print(f"Actionneur {key} mis à : {value}")
     except:
-        print("Payload JSON invalide")
+        print("Unknown reception")
 
 def main():
     client = mqtt.Client()
@@ -65,25 +63,24 @@ def main():
 
     client.connect(BROKER, PORT, 60)
 
-    client.subscribe("greenhouse/command")
+    client.subscribe(TOPIC + "/command")
 
     client.loop_start()
 
-    print("Simulation greenhouse MQTT lancée...")
+    print("Simulation...")
 
     try:
         while True:
             simulate_step()
             payload = json.dumps(state)
-            client.publish(TOPIC, payload)
-            print("Données publiées :", payload)
+            client.publish(TOPIC + "/data", payload)
+            print("Pubblished data :", payload)
             time.sleep(10)
     except KeyboardInterrupt:
-        print("\nArrêt demandé (Ctrl-C)")
+        print("Stop")
     finally:
         client.loop_stop()
         client.disconnect()
-        print("Client MQTT déconnecté proprement.")
 
 if __name__ == "__main__":
     main()
