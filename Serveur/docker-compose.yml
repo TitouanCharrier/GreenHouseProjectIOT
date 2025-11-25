@@ -1,17 +1,26 @@
+version: "3.9"
+
+networks:
+  tb-net:
+    driver: bridge
+
 services:
   postgres:
+    image: "docker.io/postgres:16"
     restart: always
-    image: "postgres:16"
     ports:
-      - "5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: thingsboard
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks: 
+      - tb-net
+
   thingsboard-ce:
+    image: "docker.io/thingsboard/tb-node:4.2.1"
     restart: always
-    image: "thingsboard/tb-node:4.2.1"
     ports:
       - "8080:8080"
       - "7070:7070"
@@ -26,10 +35,17 @@ services:
     environment:
       TB_SERVICE_ID: tb-ce-node
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/thingsboard
+      #INSTALL_TB: "true"
+      #LOAD_DEMO: "true"
     depends_on:
       - postgres
+    networks: 
+      - tb-net
+
+
 
 volumes:
   postgres-data:
     name: tb-postgres-data
     driver: local
+
