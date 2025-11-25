@@ -19,6 +19,9 @@ Fonctionnalités prévues
 
 - Exploration avancée : cliquer sur un capteur pour voir l’historique ou détails
 
+- Utilisation de sources externes pour adapter le comportement du système en focntion des types de cultures. (exmple tomates etc..)
+
+
 ## Sources
 
     Capteurs IoT connectés via MQTT, intégrés à ThingsBoard pour la collecte et la visualisation des données
